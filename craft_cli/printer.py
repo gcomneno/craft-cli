@@ -29,6 +29,7 @@ import threading
 import time
 import weakref
 from collections.abc import Callable
+from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import lru_cache
@@ -51,6 +52,12 @@ ANSI_CLEAR_LINE_TO_END = "\x1b[K"  # ANSI escape code to clear the rest of the l
 ANSI_HIDE_CURSOR = "\x1b[?25l"
 ANSI_SHOW_CURSOR = "\x1b[?25h"
 ANSI_RESET = "\x1b[0m"
+
+
+def _safe_print(*args: Any, **kwargs: Any) -> None:
+    """Print to a stream, ignoring BrokenPipeError from downstream consumers."""
+    with suppress(BrokenPipeError):
+        print(*args, **kwargs)
 
 
 def reset_terminal_style(stream: TextIO | None) -> None:
